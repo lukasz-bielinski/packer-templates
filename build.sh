@@ -75,7 +75,7 @@ packer_build() {
 # }
 
 build_ubuntu_16_04_server() {
-  export UBUNTU_VERSION="16.04.1"
+  export UBUNTU_VERSION="16.04.2"
   export UBUNTU_ARCH="amd64"
   export UBUNTU_TYPE="server"
   export NAME="ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
