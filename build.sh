@@ -1,6 +1,6 @@
 #!/bin/bash -e
 
-export USER="peru"
+export USER="lukasz-bielinski"
 export TMPDIR="/var/tmp/"
 export VIRTIO_WIN_ISO_URL="https://fedorapeople.org/groups/virt/virtio-win/direct-downloads/latest-virtio/virtio-win.iso"
 export VIRTIO_WIN_ISO=$(basename $VIRTIO_WIN_ISO_URL)
@@ -57,22 +57,22 @@ render_template() {
 packer_build() {
   PACKER_FILE=$1; shift
 
-  ~/bin/packer build -color=false $PACKER_FILE | tee "${LOG_DIR}/${NAME}-packer.log"
-  create_atlas_box
-  upload_boxfile_to_atlas
-  rm -v ${NAME}-libvirt.box
+  /usr/bin/packer-io -color=false $PACKER_FILE | tee "${LOG_DIR}/${NAME}-packer.log"
+  # create_atlas_box
+  # upload_boxfile_to_atlas
+  # rm -v ${NAME}-libvirt.box
 }
 
-build_ubuntu_16_10_desktop() {
-  export UBUNTU_VERSION="16.10"
-  export UBUNTU_ARCH="amd64"
-  export UBUNTU_TYPE="desktop"
-  export NAME="ubuntu-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
-  export DESCRIPTION=$(render_template ubuntu-${UBUNTU_TYPE}.md)
-  export SHORT_DESCRIPTION="Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
-
-  packer_build ubuntu-${UBUNTU_TYPE}.json
-}
+# build_ubuntu_16_10_desktop() {
+#   export UBUNTU_VERSION="16.10"
+#   export UBUNTU_ARCH="amd64"
+#   export UBUNTU_TYPE="desktop"
+#   export NAME="ubuntu-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
+#   export DESCRIPTION=$(render_template ubuntu-${UBUNTU_TYPE}.md)
+#   export SHORT_DESCRIPTION="Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
+#
+#   packer_build ubuntu-${UBUNTU_TYPE}.json
+# }
 
 build_ubuntu_16_04_server() {
   export UBUNTU_VERSION="16.04.1"
@@ -85,105 +85,105 @@ build_ubuntu_16_04_server() {
   packer_build ubuntu-${UBUNTU_TYPE}.json
 }
 
-build_ubuntu_14_04_server() {
-  export UBUNTU_VERSION="14.04.5"
-  export UBUNTU_ARCH="amd64"
-  export UBUNTU_TYPE="server"
-  export NAME="ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
-  export DESCRIPTION=$(render_template ubuntu-${UBUNTU_TYPE}.md)
-  export SHORT_DESCRIPTION="Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
-
-  packer_build ubuntu-${UBUNTU_TYPE}.json
-}
-
-build_my_ubuntu_14_04_server() {
-  export UBUNTU_VERSION="14.04.5"
-  export UBUNTU_ARCH="amd64"
-  export UBUNTU_TYPE="server"
-  export NAME="my-ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
-  export DESCRIPTION=$(render_template my-ubuntu-${UBUNTU_TYPE}.md)
-  export SHORT_DESCRIPTION="My Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
-
-  packer_build my-ubuntu-${UBUNTU_TYPE}.json
-}
-
-build_my_ubuntu_16_04_server() {
-  export UBUNTU_VERSION="16.04.1"
-  export UBUNTU_ARCH="amd64"
-  export UBUNTU_TYPE="server"
-  export NAME="my-ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
-  export DESCRIPTION=$(render_template my-ubuntu-${UBUNTU_TYPE}.md)
-  export SHORT_DESCRIPTION="My Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
-
-  packer_build my-ubuntu-${UBUNTU_TYPE}.json
-}
-
-build_my_centos7() {
-  export CENTOS_VERSION="7"
-  export CENTOS_TAG="1611"
-  export CENTOS_ARCH="x86_64"
-  export CENTOS_TYPE="NetInstall"
-  export NAME="my-centos-${CENTOS_VERSION}-${CENTOS_ARCH}"
-  export DESCRIPTION=$(render_template my-centos${CENTOS_VERSION}.md)
-  export SHORT_DESCRIPTION="My CentOS ${CENTOS_VERSION} ${CENTOS_ARCH} for libvirt"
-
-  packer_build my-centos${CENTOS_VERSION}.json
-}
-
-build_windows_2012_r2() {
-  export WINDOWS_VERSION="2012"
-  export WINDOWS_RELEASE="r2"
-  export WINDOWS_ARCH="x64"
-  export WINDOWS_TYPE="server"
-  export WINDOWS_EDITION="standard"
-  export NAME="windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-${WINDOWS_RELEASE}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
-  export SHORT_DESCRIPTION="Windows ${WINDOWS_TYPE^} $WINDOWS_VERSION ${WINDOWS_RELEASE^^} ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
-  export DESCRIPTION=$(render_template windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.md)
-
-  wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
-  export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
-  sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
-
-  packer_build windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.json
-
-  sudo umount $VIRTIO_WIN_ISO_DIR
-  rmdir $VIRTIO_WIN_ISO_DIR
-}
-
-build_windows_2016() {
-  export WINDOWS_VERSION="2016"
-  export WINDOWS_ARCH="x64"
-  export WINDOWS_TYPE="server"
-  export WINDOWS_EDITION="standard"
-  export NAME="windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
-  export SHORT_DESCRIPTION="Windows ${WINDOWS_TYPE^} $WINDOWS_VERSION ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
-  export DESCRIPTION=$(render_template windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.md)
-
-  wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
-  export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
-  sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
-
-  packer_build windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.json
-
-  sudo umount $VIRTIO_WIN_ISO_DIR
-  rmdir $VIRTIO_WIN_ISO_DIR
-}
-
-build_windows_10() {
-  export WINDOWS_VERSION="10"
-  export WINDOWS_ARCH="x64"
-  export WINDOWS_EDITION="enterprise"
-  export NAME="windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
-  export SHORT_DESCRIPTION="Windows $WINDOWS_VERSION ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
-  export DESCRIPTION=$(render_template windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-eval.md)
-
-  wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
-  export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
-  sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
-  packer_build windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-eval.json
-  sudo umount $VIRTIO_WIN_ISO_DIR
-  rmdir $VIRTIO_WIN_ISO_DIR
-}
+# build_ubuntu_14_04_server() {
+#   export UBUNTU_VERSION="14.04.5"
+#   export UBUNTU_ARCH="amd64"
+#   export UBUNTU_TYPE="server"
+#   export NAME="ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
+#   export DESCRIPTION=$(render_template ubuntu-${UBUNTU_TYPE}.md)
+#   export SHORT_DESCRIPTION="Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
+#
+#   packer_build ubuntu-${UBUNTU_TYPE}.json
+# }
+#
+# build_my_ubuntu_14_04_server() {
+#   export UBUNTU_VERSION="14.04.5"
+#   export UBUNTU_ARCH="amd64"
+#   export UBUNTU_TYPE="server"
+#   export NAME="my-ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
+#   export DESCRIPTION=$(render_template my-ubuntu-${UBUNTU_TYPE}.md)
+#   export SHORT_DESCRIPTION="My Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
+#
+#   packer_build my-ubuntu-${UBUNTU_TYPE}.json
+# }
+#
+# build_my_ubuntu_16_04_server() {
+#   export UBUNTU_VERSION="16.04.1"
+#   export UBUNTU_ARCH="amd64"
+#   export UBUNTU_TYPE="server"
+#   export NAME="my-ubuntu-${UBUNTU_VERSION::5}-${UBUNTU_TYPE}-${UBUNTU_ARCH}"
+#   export DESCRIPTION=$(render_template my-ubuntu-${UBUNTU_TYPE}.md)
+#   export SHORT_DESCRIPTION="My Ubuntu ${UBUNTU_VERSION::5} ${UBUNTU_TYPE} (${UBUNTU_ARCH}) for libvirt"
+#
+#   packer_build my-ubuntu-${UBUNTU_TYPE}.json
+# }
+#
+# build_my_centos7() {
+#   export CENTOS_VERSION="7"
+#   export CENTOS_TAG="1611"
+#   export CENTOS_ARCH="x86_64"
+#   export CENTOS_TYPE="NetInstall"
+#   export NAME="my-centos-${CENTOS_VERSION}-${CENTOS_ARCH}"
+#   export DESCRIPTION=$(render_template my-centos${CENTOS_VERSION}.md)
+#   export SHORT_DESCRIPTION="My CentOS ${CENTOS_VERSION} ${CENTOS_ARCH} for libvirt"
+#
+#   packer_build my-centos${CENTOS_VERSION}.json
+# }
+#
+# build_windows_2012_r2() {
+#   export WINDOWS_VERSION="2012"
+#   export WINDOWS_RELEASE="r2"
+#   export WINDOWS_ARCH="x64"
+#   export WINDOWS_TYPE="server"
+#   export WINDOWS_EDITION="standard"
+#   export NAME="windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-${WINDOWS_RELEASE}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
+#   export SHORT_DESCRIPTION="Windows ${WINDOWS_TYPE^} $WINDOWS_VERSION ${WINDOWS_RELEASE^^} ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
+#   export DESCRIPTION=$(render_template windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.md)
+#
+#   wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
+#   export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
+#   sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
+#
+#   packer_build windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.json
+#
+#   sudo umount $VIRTIO_WIN_ISO_DIR
+#   rmdir $VIRTIO_WIN_ISO_DIR
+# }
+#
+# build_windows_2016() {
+#   export WINDOWS_VERSION="2016"
+#   export WINDOWS_ARCH="x64"
+#   export WINDOWS_TYPE="server"
+#   export WINDOWS_EDITION="standard"
+#   export NAME="windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
+#   export SHORT_DESCRIPTION="Windows ${WINDOWS_TYPE^} $WINDOWS_VERSION ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
+#   export DESCRIPTION=$(render_template windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.md)
+#
+#   wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
+#   export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
+#   sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
+#
+#   packer_build windows-${WINDOWS_TYPE}-${WINDOWS_VERSION}-eval.json
+#
+#   sudo umount $VIRTIO_WIN_ISO_DIR
+#   rmdir $VIRTIO_WIN_ISO_DIR
+# }
+#
+# build_windows_10() {
+#   export WINDOWS_VERSION="10"
+#   export WINDOWS_ARCH="x64"
+#   export WINDOWS_EDITION="enterprise"
+#   export NAME="windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-${WINDOWS_ARCH}-eval"
+#   export SHORT_DESCRIPTION="Windows $WINDOWS_VERSION ${WINDOWS_EDITION^} ($WINDOWS_ARCH) Evaluation for libvirt"
+#   export DESCRIPTION=$(render_template windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-eval.md)
+#
+#   wget -c -q $VIRTIO_WIN_ISO_URL -P $TMPDIR
+#   export VIRTIO_WIN_ISO_DIR=$(mktemp -d --suffix=${NAME}-iso --tmpdir=$TMPDIR)
+#   sudo mount -o loop $TMPDIR/$VIRTIO_WIN_ISO $VIRTIO_WIN_ISO_DIR
+#   packer_build windows-${WINDOWS_VERSION}-${WINDOWS_EDITION}-eval.json
+#   sudo umount $VIRTIO_WIN_ISO_DIR
+#   rmdir $VIRTIO_WIN_ISO_DIR
+# }
 
 
 #######
@@ -192,15 +192,15 @@ build_windows_10() {
 
 main() {
   date
-  build_windows_10
-  build_windows_2012_r2
-  build_windows_2016
-  build_my_centos7
-  build_my_ubuntu_16_04_server
-  build_my_ubuntu_14_04_server
+  # build_windows_10
+  # build_windows_2012_r2
+  # build_windows_2016
+  # build_my_centos7
+  # build_my_ubuntu_16_04_server
+  # build_my_ubuntu_14_04_server
   build_ubuntu_16_04_server
-  build_ubuntu_14_04_server
-  build_ubuntu_16_10_desktop
+  # build_ubuntu_14_04_server
+  # build_ubuntu_16_10_desktop
   date
 }
 
