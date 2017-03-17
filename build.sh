@@ -57,7 +57,7 @@ render_template() {
 packer_build() {
   PACKER_FILE=$1; shift
 
-  /usr/bin/packer-io -color=false $PACKER_FILE | tee "${LOG_DIR}/${NAME}-packer.log"
+  /usr/bin/packer-io build -color=false $PACKER_FILE | tee "${LOG_DIR}/${NAME}-packer.log"
   # create_atlas_box
   # upload_boxfile_to_atlas
   # rm -v ${NAME}-libvirt.box
