@@ -26,7 +26,7 @@
       "shutdown_command": "echo 'vagrant' | sudo -S shutdown -P now",
 
       "accelerator": "kvm",
-      "qemuargs": [[ "-display", "gtk" ], [ "-m", "2G" ], [ "-smp", 2 ]],
+      "qemuargs": [[ "-display", "gtk" ], [ "-m", "4G" ], [ "-smp", 4 ]],
       "boot_wait": "2s",
       "boot_command":
       [
@@ -61,7 +61,7 @@
     [
       {
         "type": "vagrant",
-        "compression_level": 9,
+        "compression_level": 0,
         "vagrantfile_template": "Vagrantfile-linux.template",
         "output": "{{ user `name` }}-{{.Provider}}.box"
       }
